@@ -1,0 +1,37 @@
+{
+  "name": "maris/geo-services",
+  "description": "Пакет добавляет возможность работы с географическими координатами.",
+  "license": "MIT",
+  "version": "0.0.1",
+  "type": "libraries",
+  "authors": [
+    {
+      "name": "Марисов Николай Андреевич",
+      "email": "marisov123456789@mail.ru"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "maris/geo-interfaces": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/n-marisov/geo-interfaces.git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Maris\\Geo\\Service\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Maris\\Geo\\Service\\Test\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "mjaschen/phpgeo": "*"
+  }
+}
