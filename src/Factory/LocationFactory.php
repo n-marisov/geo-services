@@ -5,6 +5,7 @@ namespace Maris\Geo\Service\Factory;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
 use Maris\Interfaces\Geo\Model\CartesianInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
+use stdClass;
 
 /**
  * Фабрика для создания координат
@@ -131,6 +132,29 @@ class LocationFactory implements LocationFactoryInterface
             return (is_numeric($latitude) && is_numeric($longitude))
                 ? $this->new( (float)$latitude, (float)$longitude )
                 : null;
+        }
+        return null;
+    }
+
+    /**
+     * Получает координату из GeoJson.
+     * @param array|string|stdClass $coordinateOrGeometry
+     * @return LocationInterface|null
+     */
+    public function fromJson(array|string|stdClass $coordinateOrGeometry): ?LocationInterface
+    {
+        if (is_string($coordinateOrGeometry))
+            $array = json_decode($coordinateOrGeometry,1);
+        elseif (is_object($coordinateOrGeometry))
+            $array = (array) $coordinateOrGeometry;
+
+        if(isset($array) && is_array($array)){
+
+            if(isset($array["type"]) && $array["type"] == "Point" && isset($array["coordinates"]))
+                $array = $array["coordinates"];
+
+            if(isset($array[0]) && isset($array[1]) && is_numeric($array[0]) && is_numeric($array[1]))
+                return $this->new( $array[1], $array[0] );
         }
         return null;
     }
