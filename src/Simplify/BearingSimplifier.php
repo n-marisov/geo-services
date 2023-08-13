@@ -5,6 +5,7 @@ namespace Maris\Geo\Service\Simplify;
 
 use Maris\Interfaces\Geo\Calculator\BearingCalculatorInterface;
 use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Model\LocationInterface;
 use Maris\Interfaces\Geo\Simplifier\SimplifierInterface;
 
 /***
@@ -35,7 +36,7 @@ class BearingSimplifier implements SimplifierInterface
     /**
      * @inheritDoc
      */
-    public function simplify( LocationAggregateInterface ...$locations ): array
+    public function simplify( LocationAggregateInterface|LocationInterface ...$locations ): array
     {
         $count = count($locations);
         if($count <= 3) return  $locations;

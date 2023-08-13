@@ -5,6 +5,7 @@ namespace Maris\Geo\Service\Simplify;
 
 use Maris\Interfaces\Geo\Calculator\PerpendicularDistanceCalculatorInterface;
 use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Model\LocationInterface;
 use Maris\Interfaces\Geo\Simplifier\SimplifierInterface;
 
 /**
@@ -39,7 +40,7 @@ class DouglasPeuckerSimplifier implements SimplifierInterface
      * Упрощает список точек.
      * @inheritDoc
      */
-    public function simplify( LocationAggregateInterface ...$locations ): array
+    public function simplify( LocationAggregateInterface|LocationInterface ...$locations ): array
     {
         $dMax = 0;
         $index = 0;

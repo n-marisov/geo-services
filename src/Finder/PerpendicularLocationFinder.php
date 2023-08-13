@@ -2,6 +2,7 @@
 
 namespace Maris\Geo\Service\Finder;
 
+use Maris\Geo\Service\Traits\LocationAggregatorConverterTrait;
 use Maris\Interfaces\Geo\Factory\CartesianFactoryInterface;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
 use Maris\Interfaces\Geo\Finder\PerpendicularLocationFinderInterface;
@@ -13,6 +14,7 @@ use Maris\Interfaces\Geo\Model\LocationInterface;
  */
 class PerpendicularLocationFinder implements PerpendicularLocationFinderInterface
 {
+    use LocationAggregatorConverterTrait;
 
     /***
      * Радиус земного шара для расчетов.
@@ -39,7 +41,7 @@ class PerpendicularLocationFinder implements PerpendicularLocationFinderInterfac
     /**
      * @inheritDoc
      */
-    public function findPerpendicularLocation(LocationAggregateInterface $start, LocationAggregateInterface $end, LocationAggregateInterface $point):LocationInterface
+    public function findPerpendicularLocation(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end, LocationAggregateInterface|LocationInterface $point):LocationInterface
     {
         $a = $this->cartesianFactory->fromLocation( $start );
         $b = $this->cartesianFactory->fromLocation( $end );

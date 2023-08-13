@@ -14,7 +14,6 @@ use Maris\Interfaces\Geo\Model\LocationInterface;
  */
 class PerpendicularDistanceCalculator implements PerpendicularDistanceCalculatorInterface
 {
-
     protected DistanceCalculatorInterface $distanceCalculator;
 
     protected PerpendicularLocationFinderInterface $locationFinder;
@@ -32,35 +31,16 @@ class PerpendicularDistanceCalculator implements PerpendicularDistanceCalculator
     /**
      * Вычисляет расстояние по перпендикуляру между линией большого
      * круга и точкой.
-     * @param LocationAggregateInterface $start
-     * @param LocationAggregateInterface $end
-     * @param LocationAggregateInterface $point
+     * @param LocationAggregateInterface|LocationInterface $start
+     * @param LocationAggregateInterface|LocationInterface $end
+     * @param LocationAggregateInterface|LocationInterface $point
      * @return float
      */
-    public function calculatePerpendicularDistance(LocationAggregateInterface $start, LocationAggregateInterface $end, LocationAggregateInterface $point): float
+    public function calculatePerpendicularDistance(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end, LocationAggregateInterface|LocationInterface $point): float
     {
         return $this->distanceCalculator->calculateDistance(
             $point,
-            new class( $this->locationFinder->findPerpendicularLocation( $start, $end, $point ) ) implements LocationAggregateInterface
-            {
-                private LocationInterface $location;
-
-                /**
-                 * @param LocationInterface $location
-                 */
-                public function __construct(LocationInterface $location)
-                {
-                    $this->location = $location;
-                }
-
-                /**
-                 * @return LocationInterface
-                 */
-                public function getLocation(): LocationInterface
-                {
-                    return $this->location;
-                }
-            }
+            $this->locationFinder->findPerpendicularLocation( $start, $end, $point )
         );
     }
 }

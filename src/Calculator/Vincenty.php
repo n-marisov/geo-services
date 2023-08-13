@@ -2,6 +2,7 @@
 
 namespace Maris\Geo\Service\Calculator;
 
+use Maris\Geo\Service\Traits\LocationAggregatorConverterTrait;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
 use Maris\Interfaces\Geo\Calculator\BearingCalculatorInterface;
 use Maris\Interfaces\Geo\Calculator\DistanceCalculatorInterface;
@@ -18,6 +19,8 @@ use Maris\Interfaces\Geo\Model\LocationInterface;
  */
 class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterface,BearingCalculatorInterface
 {
+
+    use LocationAggregatorConverterTrait;
 
     protected const M_2_PI = M_PI * 2;
     protected const M_3_PI = M_PI * 3;
@@ -71,28 +74,42 @@ class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterfac
     }
 
 
-    public function calculateDistance(LocationAggregateInterface $start, LocationAggregateInterface $end): float
+    public function calculateDistance(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end): float
     {
-        return $this->inverse( $start->getLocation(), $end->getLocation() )["distance"];
+        $start = self::deg2radLocationToArray( $start );
+        $end = self::deg2radLocationToArray( $end );
+        return $this->inverse( $start["lat"], $start["long"], $end["lat"], $end["long"] )["distance"];
+        //return $this->inverse( $start->getLocation(), $end->getLocation() )["distance"];
     }
 
-    public function findDestination(LocationAggregateInterface $location, float $initialBearing, float $distance): LocationInterface
+    public function findDestination(LocationAggregateInterface|LocationInterface $location, float $initialBearing, float $distance): LocationInterface
     {
+        $location = self::deg2radLocationToArray( $location );
         return $this->locationFactory->new(
+            ...$this->direct($location["lat"],$location["long"], deg2rad( $initialBearing ), $distance
+        )["destination"]);
+        /*return $this->locationFactory->new(
             ...$this->direct(
                 $location->getLocation(), $initialBearing, $distance
             )["destination"]
-        );
+        );*/
     }
 
-    public function calculateInitialBearing(LocationAggregateInterface $start, LocationAggregateInterface $end): float
+    public function calculateInitialBearing(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end): float
     {
-        return $this->inverse( $start->getLocation(), $end->getLocation() )["bearing"]["initial"];
+        $start = self::deg2radLocationToArray( $start );
+        $end = self::deg2radLocationToArray( $end );
+        return $this->inverse( $start["lat"], $start["long"], $end["lat"], $end["long"] )["bearing"]["initial"];
+
+        //return $this->inverse( $start->getLocation(), $end->getLocation() )["bearing"]["initial"];
     }
 
-    public function calculateFinalBearing(LocationAggregateInterface $start, LocationAggregateInterface $end): float
+    public function calculateFinalBearing(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end): float
     {
-        return $this->inverse( $start->getLocation(), $end->getLocation() )["bearing"]["final"];
+        $start = self::deg2radLocationToArray( $start );
+        $end = self::deg2radLocationToArray( $end );
+        return $this->inverse( $start["lat"], $start["long"], $end["lat"], $end["long"] )["bearing"]["final"];
+        //return $this->inverse( $start->getLocation(), $end->getLocation() )["bearing"]["final"];
     }
 
     /**
@@ -164,26 +181,29 @@ class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterfac
 
     /**
      * Обратная задача
-     * @param LocationInterface $start
-     * @param LocationInterface $end
+     * @param $startLat
+     * @param $startLon
+     * @param $endLat
+     * @param $endLon
      * @return array{distance:float,bearing:array{initial:float,final:float}}
      */
-    public function inverse( LocationInterface $start, LocationInterface $end ):array
+    //public function inverse( LocationInterface $start, LocationInterface $end ):array
+    protected function inverse( $startLat, $startLon, $endLat, $endLon ):array
     {
 
-        $startLat = deg2rad( $start->getLatitude() );
+        /*$startLat = deg2rad( $start->getLatitude() );
         $endLat = deg2rad($end->getLatitude());
         $startLon = deg2rad( $start->getLongitude() );
-        $endLon = deg2rad($end->getLongitude());
+        $endLon = deg2rad($end->getLongitude());*/
 
-        $f = $this->flattening;
+        //$f = $this->flattening;
 
         $L = $endLon - $startLon;
 
-        $tanU1 = (1 - $f) * tan($startLat);
+        $tanU1 = (1 - $this->flattening) * tan($startLat);
         $cosU1 = 1 / sqrt(1 + $tanU1 * $tanU1);
         $sinU1 = $tanU1 * $cosU1;
-        $tanU2 = (1 - $f) * tan($endLat);
+        $tanU2 = (1 - $this->flattening) * tan($endLat);
         $cosU2 = 1 / sqrt(1 + $tanU2 * $tanU2);
         $sinU2 = $tanU2 * $cosU2;
 
@@ -220,7 +240,7 @@ class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterfac
             $C = $this->calcC( $cosSquAlpha );
 
             $lambdaP = $lambda;
-            $lambda = $L + (1 - $C) * $f * $sinAlpha
+            $lambda = $L + (1 - $C) * $this->flattening * $sinAlpha
                 * ($sigma + $C * $sinSigma * ($cos2SigmaM + $C * $cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM)));
             $iterations++;
         } while ( abs($lambda - $lambdaP) > 1E-12 && $this->iMax > $iterations);
@@ -251,21 +271,23 @@ class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterfac
 
     /**
      * Реализация прямой задачи.
-     * @param LocationInterface $start
-     * @param float $initialBearing
+     * @param float $startLat
+     * @param float $startLong
+     * @param float $bearing
      * @param float $distance
      * @return array
      */
-    public function direct( LocationInterface $start , float $initialBearing, float $distance ):array
+    //public function direct( LocationInterface $start , float $initialBearing, float $distance ):array
+    protected function direct( float $startLat, float $startLong , float $bearing, float $distance ):array
     {
-        $phi1 = deg2rad( $start->getLatitude() );
-        $lambda1 = deg2rad( $start->getLongitude() );
-        $alpha1 = deg2rad( $initialBearing );
+        /*$startLat = deg2rad( $start->getLatitude() );
+        $startLong = deg2rad( $start->getLongitude() );
+        $bearing = deg2rad( $initialBearing );*/
 
-        $sinAlpha1 = sin( $alpha1 );
-        $cosAlpha1 = cos( $alpha1 );
+        $sinAlpha1 = sin( $bearing );
+        $cosAlpha1 = cos( $bearing );
 
-        $tanU1 = ( 1 - $this->flattening ) * tan($phi1);
+        $tanU1 = ( 1 - $this->flattening ) * tan($startLat);
         $cosU1 = 1 / sqrt(1 + $tanU1 * $tanU1);
         $sinU1 = $tanU1 * $cosU1;
         $sigma1 = atan2($tanU1, $cosAlpha1);
@@ -305,7 +327,7 @@ class Vincenty implements DestinationFinderInterface, DistanceCalculatorInterfac
             - (1 - $C) * $this->flattening * $sinAlpha
             * ($sigma + $C * $sinSigma * ($cos2SigmaM + $C * $cosSigma * (-1 + 2 * $cos2SigmaM ** 2)));
 
-        $lambda2 = fmod($lambda1 + $L + self::M_3_PI, self::M_2_PI ) - M_PI;
+        $lambda2 = fmod($startLong + $L + self::M_3_PI, self::M_2_PI ) - M_PI;
 
         $alpha2 = atan2( $sinAlpha, -$tmp );
         $alpha2 = fmod($alpha2 + self::M_2_PI , self::M_2_PI );

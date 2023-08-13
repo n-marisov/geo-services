@@ -3,8 +3,10 @@
 namespace Maris\Geo\Service\Calculator;
 
 
+use Maris\Geo\Service\Traits\LocationAggregatorConverterTrait;
 use Maris\Interfaces\Geo\Calculator\BearingCalculatorInterface;
 use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Model\LocationInterface;
 
 /**
  * Калькулятор азимутов сферической земли.
@@ -12,23 +14,21 @@ use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
  */
 class SphericalBearingCalculator implements BearingCalculatorInterface
 {
-
+    use LocationAggregatorConverterTrait;
     /**
      * @inheritDoc
      */
-    public function calculateInitialBearing(LocationAggregateInterface $start, LocationAggregateInterface $end): float
+    public function calculateInitialBearing(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end): float
     {
-        $start = $start->getLocation();
-        $end = $end->getLocation();
-        $lat1 = deg2rad( $start->getLatitude() );
-        $lng1 = deg2rad( $start->getLongitude() );
-        $lat2 = deg2rad( $end->getLatitude() );
-        $lng2 = deg2rad( $end->getLongitude() );
+        $start = self::deg2radLocationToArray( $start );
+        $end = self::deg2radLocationToArray( $end );
 
-        $y = sin($lng2 - $lng1) * cos($lat2);
-        $x = cos($lat1) * sin($lat2) - sin($lat1) * cos($lat2) * cos($lng2 - $lng1);
-
-        $bearing = rad2deg(atan2($y, $x));
+        $bearing = rad2deg(
+            atan2(
+                sin($end["long"] - $start["long"]) * cos($end["lat"]),
+                cos($start["lat"]) * sin($end["lat"]) - sin($start["lat"]) * cos($end["lat"]) * cos($end["long"] - $start["long"])
+            )
+        );
 
         if ($bearing < 0)
             $bearing = fmod($bearing + 360, 360);
@@ -39,7 +39,7 @@ class SphericalBearingCalculator implements BearingCalculatorInterface
     /**
      * @inheritDoc
      */
-    public function calculateFinalBearing(LocationAggregateInterface $start, LocationAggregateInterface $end): float
+    public function calculateFinalBearing(LocationAggregateInterface|LocationInterface $start, LocationAggregateInterface|LocationInterface $end): float
     {
         return fmod($this->calculateInitialBearing( $end, $start ) + 180, 360);
     }

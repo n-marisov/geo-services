@@ -5,6 +5,7 @@ namespace Maris\Geo\Service\Factory;
 use Maris\Interfaces\Geo\Factory\CartesianFactoryInterface;
 use Maris\Interfaces\Geo\Model\CartesianInterface;
 use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Model\LocationInterface;
 
 class CartesianFactory implements CartesianFactoryInterface
 {
@@ -26,7 +27,7 @@ class CartesianFactory implements CartesianFactoryInterface
     /**
      * @inheritDoc
      */
-    public function fromLocation( LocationAggregateInterface $location ): CartesianInterface
+    public function fromLocation( LocationAggregateInterface|LocationInterface $location ): CartesianInterface
     {
         $location = $location->getLocation();
 
