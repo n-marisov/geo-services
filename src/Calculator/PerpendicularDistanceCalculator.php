@@ -6,7 +6,7 @@ namespace Maris\Geo\Service\Calculator;
 use Maris\Interfaces\Geo\Calculator\DistanceCalculatorInterface;
 use Maris\Interfaces\Geo\Calculator\PerpendicularDistanceCalculatorInterface;
 use Maris\Interfaces\Geo\Finder\PerpendicularLocationFinderInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 
 /***

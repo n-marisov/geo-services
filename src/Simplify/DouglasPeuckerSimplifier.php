@@ -4,7 +4,7 @@ namespace Maris\Geo\Service\Simplify;
 
 
 use Maris\Interfaces\Geo\Calculator\PerpendicularDistanceCalculatorInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 use Maris\Interfaces\Geo\Simplifier\SimplifierInterface;
 

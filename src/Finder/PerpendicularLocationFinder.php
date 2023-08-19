@@ -6,7 +6,7 @@ use Maris\Geo\Service\Traits\LocationAggregatorConverterTrait;
 use Maris\Interfaces\Geo\Factory\CartesianFactoryInterface;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
 use Maris\Interfaces\Geo\Finder\PerpendicularLocationFinderInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 
 /**

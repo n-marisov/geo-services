@@ -2,15 +2,16 @@
 
 namespace Maris\Geo\Service\Factory;
 
-use ArrayIterator;
+
+use Maris\Interfaces\Geo\AbstractModel\AbstractPolyline;
 use Maris\Interfaces\Geo\Encoder\PolylineEncoderInterface;
 use Maris\Interfaces\Geo\Factory\BoundsFactoryInterface;
 use Maris\Interfaces\Geo\Factory\PolylineFactoryInterface;
 use Maris\Interfaces\Geo\Model\BoundsInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Model\LocationInterface;
 use Maris\Interfaces\Geo\Model\PolylineInterface;
 use stdClass;
-use Traversable;
 
 class PolylineFactory implements PolylineFactoryInterface
 {
@@ -34,36 +35,63 @@ class PolylineFactory implements PolylineFactoryInterface
      */
     public function new(iterable $coordinates): PolylineInterface
     {
-        return new class ( $coordinates ) implements PolylineInterface
+
+        return new class ( $coordinates, $this->boundsFactory ) extends AbstractPolyline
         {
-            protected array $coordinates = [];
+            protected array $coordinates;
 
             protected BoundsFactoryInterface $boundsFactory;
 
             /**
-             * @param array<LocationAggregateInterface> $coordinates
+             * @param array $coordinates
+             * @param BoundsFactoryInterface $boundsFactory
              */
-            public function __construct( iterable $coordinates, BoundsFactoryInterface $boundsFactory )
+            public function __construct(array $coordinates, BoundsFactoryInterface $boundsFactory)
             {
-                foreach ($coordinates as $coordinate)
-                    if(is_a($coordinate,LocationAggregateInterface::class))
-                        $this->coordinates[] = $coordinate;
+                $this->coordinates = $coordinates;
                 $this->boundsFactory = $boundsFactory;
             }
 
+
             public function getBounds(): BoundsInterface
             {
-                return $this->boundsFactory->fromLocations( ...$this->coordinates );
+                return $this->boundsFactory->fromLocations( ... $this->coordinates );
             }
 
-            public function getId(): ?int
+            public function add(LocationInterface|LocationAggregateInterface $location): PolylineInterface
             {
+                $this->coordinates[] = $location;
+                return $this;
+            }
+
+            public function get(int $position): LocationInterface|LocationAggregateInterface|null
+            {
+                return $this->coordinates[$position] ?? null;
+            }
+
+            public function remove(LocationInterface|int|LocationAggregateInterface $locationOrPosition): LocationInterface|LocationAggregateInterface|null
+            {
+                if(is_numeric($locationOrPosition))
+                {
+                    if(isset($this->coordinates[$locationOrPosition])){
+                        $location = $this->coordinates[$locationOrPosition];
+                        unset($this->coordinates[$locationOrPosition]);
+                        return $location;
+                    }
+                    return null;
+                }
+
+                $position = array_search($locationOrPosition,$this->coordinates);
+
+                if( $position !== false )
+                    return $this->remove($position);
+
                 return null;
             }
 
-            public function getIterator(): Traversable
+            public function toArray(): array
             {
-                return new ArrayIterator( $this->coordinates );
+                return $this->coordinates;
             }
         };
     }

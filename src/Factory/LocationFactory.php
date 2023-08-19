@@ -2,7 +2,9 @@
 
 namespace Maris\Geo\Service\Factory;
 
+use Maris\Interfaces\Geo\AbstractModel\AbstractLocation;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
+use Maris\Interfaces\Geo\Model\BoundsInterface;
 use Maris\Interfaces\Geo\Model\CartesianInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 use stdClass;
@@ -12,7 +14,6 @@ use stdClass;
  */
 class LocationFactory implements LocationFactoryInterface
 {
-
     /***
      * Радиус земного шара для расчетов.
      * @var float
@@ -43,24 +44,7 @@ class LocationFactory implements LocationFactoryInterface
      */
     public function new(float $latitude, float $longitude): LocationInterface
     {
-        return new class ( $latitude, $longitude ) implements LocationInterface
-        {
-            private float $latitude;
-            private float $longitude;
-            public function __construct(float $latitude, float $longitude)
-            {
-                $this->latitude = $latitude;
-                $this->longitude = $longitude;
-            }
-            public function getLatitude(): float
-            {
-                return $this->latitude;
-            }
-            public function getLongitude(): float
-            {
-                return $this->longitude;
-            }
-        };
+        return new class ( $latitude, $longitude ) extends AbstractLocation{};
     }
 
     /**

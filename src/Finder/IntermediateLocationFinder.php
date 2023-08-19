@@ -5,11 +5,15 @@ namespace Maris\Geo\Service\Finder;
 use Maris\Geo\Service\Traits\LocationAggregatorConverterTrait;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
 use Maris\Interfaces\Geo\Finder\IntermediateLocationFinderInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Finder\MidLocationFinderInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 use RuntimeException;
 
-class IntermediateLocationFinder implements IntermediateLocationFinderInterface
+/***
+ * Получает промежуточную точку
+ */
+class IntermediateLocationFinder implements IntermediateLocationFinderInterface, MidLocationFinderInterface
 {
 
     use LocationAggregatorConverterTrait;
@@ -60,5 +64,16 @@ class IntermediateLocationFinder implements IntermediateLocationFinderInterface
             rad2deg( atan2($z, sqrt($x ** 2 + $y ** 2)) ),
             rad2deg( atan2($y, $x) )
         );
+    }
+
+    /**
+     * Получает среднюю точку.
+     * @param LocationInterface|LocationAggregateInterface $start
+     * @param LocationInterface|LocationAggregateInterface $end
+     * @return LocationInterface
+     */
+    public function findMidLocation(LocationInterface|LocationAggregateInterface $start, LocationInterface|LocationAggregateInterface $end): LocationInterface
+    {
+        return $this->findIntermediateLocation( $start, $end, 50.0 );
     }
 }

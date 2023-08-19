@@ -2,9 +2,10 @@
 
 namespace Maris\Geo\Service\Factory;
 
+use Maris\Interfaces\Geo\AbstractModel\AbstractCartesian;
 use Maris\Interfaces\Geo\Factory\CartesianFactoryInterface;
 use Maris\Interfaces\Geo\Model\CartesianInterface;
-use Maris\Interfaces\Geo\Model\LocationAggregateInterface;
+use Maris\Interfaces\Geo\Aggregate\LocationAggregateInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 
 class CartesianFactory implements CartesianFactoryInterface
@@ -43,38 +44,6 @@ class CartesianFactory implements CartesianFactoryInterface
 
     public function new(float $x, float $y, float $z): CartesianInterface
     {
-        return new class ($x,$y,$z) implements CartesianInterface{
-
-            protected float $x;
-            protected float $y;
-            protected float $z;
-
-            /**
-             * @param float $x
-             * @param float $y
-             * @param float $z
-             */
-            public function __construct(float $x, float $y, float $z)
-            {
-                $this->x = $x;
-                $this->y = $y;
-                $this->z = $z;
-            }
-
-            public function getX(): float
-            {
-                return $this->x;
-            }
-
-            public function getY(): float
-            {
-                return $this->y;
-            }
-
-            public function getZ(): float
-            {
-                return $this->z;
-            }
-        };
+        return new class ($x,$y,$z) extends AbstractCartesian {};
     }
 }
