@@ -4,7 +4,6 @@ namespace Maris\Geo\Service\Factory;
 
 use Maris\Interfaces\Geo\AbstractModel\AbstractLocation;
 use Maris\Interfaces\Geo\Factory\LocationFactoryInterface;
-use Maris\Interfaces\Geo\Model\BoundsInterface;
 use Maris\Interfaces\Geo\Model\CartesianInterface;
 use Maris\Interfaces\Geo\Model\LocationInterface;
 use stdClass;

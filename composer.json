@@ -12,12 +12,17 @@
   ],
   "require": {
     "php": ">=8.1",
-    "maris/geo-interfaces": "dev-master"
+    "maris/geo-interfaces": "dev-master",
+    "maris/geo-abstract-models": "dev-master"
   },
   "repositories": [
     {
       "type": "git",
       "url": "https://github.com/n-marisov/geo-interfaces.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/n-marisov/geo-abstract-models.git"
     }
   ],
   "autoload": {

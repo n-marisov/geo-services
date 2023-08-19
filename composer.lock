@@ -4,15 +4,46 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b174d3506d77c6e4f3d5bae2453e6c38",
+    "content-hash": "012f55cf937012032c473bedf0ba8dc6",
     "packages": [
+        {
+            "name": "maris/geo-abstract-models",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/n-marisov/geo-abstract-models.git",
+                "reference": "b3ea54bd182cf09b9085a5a918294aff89fa170e"
+            },
+            "require": {
+                "maris/geo-interfaces": "dev-master",
+                "php": ">=8.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Maris\\Interfaces\\Geo\\AbstractModel\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Марисов Николай Андреевич",
+                    "email": "marisov123456789@mail.ru"
+                }
+            ],
+            "description": "Набор абстрактных моделей для географических сервисов.",
+            "time": "2023-08-19T09:40:51+00:00"
+        },
         {
             "name": "maris/geo-interfaces",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/n-marisov/geo-interfaces.git",
-                "reference": "cc6443a01e208de75d76cb998298cf70bd487e41"
+                "reference": "53cf34cc61c87930d46eaef953e7ed633cdc3657"
             },
             "require": {
                 "php": ">=8.1"
@@ -34,7 +65,7 @@
                 }
             ],
             "description": "Набор интерфейсов для географических сервисов.",
-            "time": "2023-08-19T09:12:27+00:00"
+            "time": "2023-08-19T09:38:10+00:00"
         }
     ],
     "packages-dev": [
@@ -1724,7 +1755,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "maris/geo-interfaces": 20
+        "maris/geo-interfaces": 20,
+        "maris/geo-abstract-models": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
